@@ -31,6 +31,17 @@ func DecryptMessages(messageArray []config.MessageStruct) {
 			return
 		}
 
-		DecryptMessage(message.Payload, message.From, pubKey, privKey)
+		// var messageJson config.MessageStruct
+		payloadBytes, err := DecryptMessage(message.Payload, message.From, pubKey, privKey)
+		if err != nil {
+			log.Fatalf("Fail to decrypt message %s.\n", message.From)
+			return
+		}
+		messageArray[i].Decrypted = string(payloadBytes)
+		fmt.Println("decrypted message:", messageArray[i].Decrypted)
+		// if err := json.Unmarshal(res, &messageJson); err != nil { // Parse []byte to go struct pointer
+		// 	fmt.Println("Can not unmarshal JSON")
+		// }
+
 	}
 }

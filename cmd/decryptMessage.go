@@ -13,6 +13,7 @@ import (
 	"jmessage_2024/utils"
 	"log"
 	"math/big"
+	"os"
 
 	"golang.org/x/crypto/chacha20"
 )
@@ -22,7 +23,7 @@ type Signature struct {
 	S *big.Int
 }
 
-func DecryptMessage(payload string, senderUsername string, senderPubKey *config.PubKeyStruct, recipientPrivKey *config.PrivKeyStruct) ([]byte, error) {
+func DecryptMessage(payload string, senderUsername string, senderPubKey *config.PubKeyStruct, recipientPrivKey *config.PrivKeyStruct) (message []byte, err error) {
 	// TODO: IMPLEMENT
 
 	payloadBytes, err := base64.StdEncoding.DecodeString(payload)
@@ -61,13 +62,16 @@ func DecryptMessage(payload string, senderUsername string, senderPubKey *config.
 		log.Fatalf("Failed to decode C2 and obtain K: %v", err)
 	}
 
-	sender, msg, err := decryptC2(ciphertext.C2, K)
+	sender, message, err := decryptC2(ciphertext.C2, K)
 	if err != nil {
 		log.Fatalf("Failed to decrypt C2 %v", err)
 	}
-	println("sender", sender, "msg", msg)
+	if string(sender) != senderUsername {
+		log.Fatalf("Failed to decrypt C2 %v", err)
+		os.Exit(1)
+	}
 
-	return nil, nil
+	return message, err
 }
 
 func verifySignature(pubKey *ecdsa.PublicKey, toVerify []byte, signature []byte) bool {
@@ -152,7 +156,7 @@ func decodeC1ObtainK(base64C1 string) (K [32]byte, err error) {
 	return K, err
 }
 
-func decryptC2(c2 string, K [32]byte) (senderUsername, message []byte, err error) {
+func decryptC2(c2 string, K [32]byte) (senderUsername []byte, message []byte, err error) {
 	// Step 1: BASE64 Decode C2
 	encrypted, err := base64.StdEncoding.DecodeString(string(c2))
 	if err != nil {

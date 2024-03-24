@@ -67,7 +67,8 @@ func DecryptMessage(payload string, senderUsername string, senderPubKey *config.
 		log.Fatalf("Failed to decrypt C2 %v", err)
 	}
 	if string(sender) != senderUsername {
-		log.Fatalf("Failed to decrypt C2 %v", err)
+		fmt.Printf("origin sender %s, received sender, %s", senderUsername, string(sender))
+		log.Fatalf("sender is not the origin sender %v", err)
 		os.Exit(1)
 	}
 
@@ -127,19 +128,6 @@ func decodeC1ObtainK(base64C1 string) (K [32]byte, err error) {
 		log.Fatalf("Not an ECDH public key: %v", err)
 		return
 	}
-
-	// fileContent, err := os.ReadFile("cred/globalKeys.json")
-	// if err != nil {
-	// 	log.Fatalf("Error read file error: %v", err)
-	// 	return
-	// }
-
-	// var privKey config.PrivKeyStruct
-	// err = json.Unmarshal(fileContent, &privKey)
-	// if err != nil {
-	// 	log.Fatalf("Error unmarshal privatekey error: %v", err)
-	// 	return
-	// }
 
 	encSK, err := utils.DecodeECDHPrivateKey(config.Global.GlobalPrivKey.EncSK)
 	if err != nil {

@@ -14,19 +14,20 @@ func PrintMessageList(messageArray []config.MessageStruct) {
 	fmt.Printf("You have %d new messages\n-----------------------------\n\n", len(messageArray))
 	// Iterate through the array, printing each message
 	for i := 0; i < len(messageArray); i++ {
-		if messageArray[i].ReceiptID != 0 {
-			fmt.Printf("Read receipt\n")
-			continue
-		}
 
 		fmt.Printf("From: %s\n\n", messageArray[i].From)
-
-		fmt.Printf(messageArray[i].Decrypted)
-		if messageArray[i].LocalPath != "" {
-			fmt.Printf("\n\tFile downloaded to %s\n", messageArray[i].LocalPath)
-		} else if messageArray[i].Url != "" {
-			fmt.Printf("\n\tAttachment download failed\n")
+		if messageArray[i].Payload == "" {
+			fmt.Printf("Read receipt, receipt id: %d\n", messageArray[i].ReceiptID)
+		} else {
+			fmt.Printf(messageArray[i].Decrypted)
+			fmt.Println("message local path", messageArray[i].LocalPath)
+			if messageArray[i].LocalPath != "" {
+				fmt.Printf("\n\tFile downloaded to %s\n", messageArray[i].LocalPath)
+			} else if messageArray[i].Url != "" {
+				fmt.Printf("\n\tAttachment download failed\n")
+			}
 		}
+
 		fmt.Printf("\n-----------------------------\n\n")
 	}
 }

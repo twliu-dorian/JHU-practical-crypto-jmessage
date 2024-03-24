@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"os"
@@ -43,7 +42,7 @@ func UploadFileToServer(filename string) (string, error) {
 	defer resp.Body.Close()
 
 	// Read the response body
-	respBody, err := ioutil.ReadAll(resp.Body)
+	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		// Handle error
 		fmt.Println("Error while reading the response bytes:", err)
@@ -81,6 +80,7 @@ func DownloadFileFromServer(geturl string, localPath string) error {
 	}
 
 	// Create the file
+	fmt.Println("downloading file to local", localPath)
 	out, err := os.Create(localPath)
 	if err != nil {
 		return err

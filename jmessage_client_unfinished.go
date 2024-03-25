@@ -166,6 +166,13 @@ func main() {
 				// Finally, send the encrypted message to the server
 				cmd.SendMessageToServer(config.Global.Username, recipient, []byte(encryptedMessage), 0)
 			}
+		case "FP":
+			fingerprint, err := cmd.ComputeFingerPrint(strings.TrimSpace(parts[1]))
+			if err != nil {
+				fmt.Println("An error occured while getting fingerprint", err)
+			} else {
+				fmt.Printf("%s's public key fingerprint is: %s\n", strings.TrimSpace(parts[1]), fingerprint)
+			}
 		case "QUIT":
 			running = false
 		case "HELP":

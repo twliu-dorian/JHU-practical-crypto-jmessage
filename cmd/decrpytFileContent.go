@@ -29,7 +29,6 @@ func DecryptFileContent(messageArray []config.MessageStruct) (err error) {
 
 	for i := 0; i < len(messageArray); i++ {
 		message := messageArray[i].Decrypted
-		fmt.Println("messageArray[i].Decrypted", messageArray[i].Decrypted)
 		matches := re.FindStringSubmatch(message)
 		var sourceHash, key, ciphertextHash, url string
 		var ciphertextData []byte
@@ -43,46 +42,44 @@ func DecryptFileContent(messageArray []config.MessageStruct) (err error) {
 			fmt.Println("URL:", url)
 			fmt.Println("KEY:", key)
 			fmt.Println("H:", sourceHash)
-		} else {
-			fmt.Println("No matches found or error in parsing")
-		}
+			var originHashBytes [32]byte
 
-		var originHashBytes [32]byte
+			if messageArray[i].LocalPath != "" {
+				ciphertextData, err = os.ReadFile(messageArray[i].LocalPath)
+				if err != nil {
+					log.Fatalf("Failed to read file: %v", err)
+				}
+				fmt.Println("cipher text data", string(ciphertextData))
 
-		if messageArray[i].LocalPath != "" {
-			ciphertextData, err = os.ReadFile(messageArray[i].LocalPath)
-			if err != nil {
-				log.Fatalf("Failed to read file: %v", err)
+				originHashBytes = sha256.Sum256(ciphertextData)
+
+				ciphertextHash = base64.StdEncoding.EncodeToString(originHashBytes[:])
 			}
-			fmt.Println("cipher text data", string(ciphertextData))
+			fmt.Println("ciphertextHash", ciphertextHash)
+			fmt.Println("sourceHash", sourceHash)
 
-			originHashBytes = sha256.Sum256(ciphertextData)
+			if sourceHash != ciphertextHash {
+				log.Fatalf("source hash and cipher text hash doesn't match")
+			}
+			keyBytes, err := base64.StdEncoding.DecodeString(key)
+			if err != nil {
+				log.Fatalf("fail to decode base 64 chacha20 key: %v", err)
+			}
 
-			ciphertextHash = base64.StdEncoding.EncodeToString(originHashBytes[:])
+			datPattern := regexp.MustCompile(`([^/]+\.dat)`)
+			datFilename := datPattern.FindStringSubmatch(url)
+			plaintextFilePath := plaintextFilePath + datFilename[0]
+			plaintextData, err := decryptFile(keyBytes, ciphertextData)
+			if err != nil {
+				log.Fatalf("Error decoding file: %v", err)
+			}
+			fmt.Println("plain text data", string(plaintextData))
+			if err := os.WriteFile(plaintextFilePath, plaintextData, 0644); err != nil {
+				log.Fatalf("Error writing plaintext file: %v", err)
+				return err
+			}
 		}
-		fmt.Println("ciphertextHash", ciphertextHash)
-		fmt.Println("sourceHash", sourceHash)
 
-		if sourceHash != ciphertextHash {
-			log.Fatalf("source hash and cipher text hash doesn't match")
-		}
-		keyBytes, err := base64.StdEncoding.DecodeString(key)
-		if err != nil {
-			log.Fatalf("fail to decode base 64 chacha20 key: %v", err)
-		}
-
-		datPattern := regexp.MustCompile(`([^/]+\.dat)`)
-		datFilename := datPattern.FindStringSubmatch(url)
-		plaintextFilePath := plaintextFilePath + datFilename[0]
-		plaintextData, err := decryptFile(keyBytes, ciphertextData)
-		if err != nil {
-			log.Fatalf("Error decoding file: %v", err)
-		}
-		fmt.Println("plain text data", string(plaintextData))
-		if err := os.WriteFile(plaintextFilePath, plaintextData, 0644); err != nil {
-			log.Fatalf("Error writing plaintext file: %v", err)
-			return err
-		}
 	}
 	return err
 }

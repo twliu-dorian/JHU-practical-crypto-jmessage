@@ -25,32 +25,34 @@ func DownloadAttachments(messageArray []config.MessageStruct) {
 		}
 	}
 
-	pattern := `>>>MSGURL=(https:\/\/localhost:8080\/downloadFile\/matthew\/([^?]+))\?KEY=([^?]+)\?H=([^=]+)=`
+	pattern := `>>>MSGURL=([^?]+)\?KEY=([^?]+)\?H=([^=]+=)`
 	re := regexp.MustCompile(pattern)
 
 	// Iterate through the array, checking for attachments
 	for i := 0; i < len(messageArray); i++ {
+
 		message := messageArray[i].Decrypted
 		matches := re.FindStringSubmatch(message)
-		messageArray[i].Url = matches[1]
-		fmt.Println("messageArray[i].Url:", messageArray[i].Url)
+		if matches != nil && len(matches) > 0 {
+			messageArray[i].Url = matches[1]
+			fmt.Println("messageArray[i].Url:", messageArray[i].Url)
 
-		// Make a random filename
-		randBytes := make([]byte, 16)
-		if _, err := rand.Read(randBytes); err != nil {
-			fmt.Println("Error generating random bytes:", err)
-			continue // Skip this iteration
+			// Make a random filename
+			randBytes := make([]byte, 16)
+			if _, err := rand.Read(randBytes); err != nil {
+				fmt.Println("Error generating random bytes:", err)
+				continue // Skip this iteration
+			}
+
+			localPath := filepath.Join(downloadFolder, "/"+"attachment_"+hex.EncodeToString(randBytes)+".dat")
+
+			err := DownloadFileFromServer(messageArray[i].Url, localPath)
+			if err == nil {
+				messageArray[i].LocalPath = localPath
+				fmt.Println("assigned local path", messageArray[i].LocalPath)
+			} else {
+				fmt.Println(err)
+			}
 		}
-
-		localPath := filepath.Join(downloadFolder, "/"+"attachment_"+hex.EncodeToString(randBytes)+".dat")
-
-		err := DownloadFileFromServer(messageArray[i].Url, localPath)
-		if err == nil {
-			messageArray[i].LocalPath = localPath
-			fmt.Println("assigned local path", messageArray[i].LocalPath)
-		} else {
-			fmt.Println(err)
-		}
-
 	}
 }

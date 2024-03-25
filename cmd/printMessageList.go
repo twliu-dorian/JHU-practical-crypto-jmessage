@@ -19,8 +19,7 @@ func PrintMessageList(messageArray []config.MessageStruct) {
 		if messageArray[i].Payload == "" {
 			fmt.Printf("Read receipt, receipt id: %d\n", messageArray[i].ReceiptID)
 		} else {
-			fmt.Printf(messageArray[i].Decrypted)
-			fmt.Println("message local path", messageArray[i].LocalPath)
+			fmt.Printf("Message: %s", messageArray[i].Decrypted)
 			if messageArray[i].LocalPath != "" {
 				fmt.Printf("\n\tFile downloaded to %s\n", messageArray[i].LocalPath)
 			} else if messageArray[i].Url != "" {

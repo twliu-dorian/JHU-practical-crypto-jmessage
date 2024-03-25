@@ -13,10 +13,7 @@ func DecryptMessages(messageArray []config.MessageStruct) {
 	for i := 0; i < len(messageArray); i++ {
 		message := messageArray[i]
 
-		if messageArray[i].Payload == "" {
-			fmt.Println("this is a message receipt")
-			fmt.Println("receipt id:", messageArray[i].ReceiptID)
-		} else {
+		if messageArray[i].Payload != "" {
 			fileContent, err := os.ReadFile("cred/globalKeys.json")
 			if err != nil {
 				log.Fatalf("Error read file error: %v", err)

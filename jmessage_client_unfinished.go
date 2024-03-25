@@ -105,8 +105,6 @@ func main() {
 				fmt.Print(err)
 			} else {
 				cmd.DownloadAttachments(messageList)
-				time.Sleep(10 * time.Second)
-
 				cmd.DecryptFileContent(messageList)
 				cmd.PrintMessageList(messageList)
 			}

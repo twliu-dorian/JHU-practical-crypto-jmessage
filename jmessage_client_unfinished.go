@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"encoding/json"
 	"fmt"
 
 	"os"
@@ -59,18 +58,6 @@ func main() {
 	// stateful global keys
 	config.Global.GlobalPrivKey = globalPrivKey
 	config.Global.GlobalPubKey = globalPubKey
-
-	// Write JSON to file
-	globalPrivKeyJson, err := json.Marshal(globalPrivKey)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	err = os.WriteFile("cred/globalKeys.json", globalPrivKeyJson, 0644)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
 
 	err = auth.RegisterPublicKeyWithServer(config.Global.Username, globalPubKey)
 	if err != nil {

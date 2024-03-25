@@ -10,7 +10,6 @@ import (
 	"encoding/json"
 	"hash/crc32"
 	"log"
-	"os"
 
 	"jmessage_2024/config"
 	"jmessage_2024/utils"
@@ -113,21 +112,7 @@ func EncryptMessage(message []byte, senderUsername string, recipientPubKey *conf
 	/**
 		Compute c1 and K
 	*/
-	// Decode sender's private signing key (sigSK)
-	// This function needs to be defined by you, based on how the private key is stored/encoded
-	// Read JSON from file
-	fileContent, err := os.ReadFile("cred/globalKeys.json")
-	if err != nil {
-		log.Fatalf("Error read file error: %v", err)
-		return
-	}
-
-	var privKey config.PrivKeyStruct
-	err = json.Unmarshal(fileContent, &privKey)
-	if err != nil {
-		log.Fatalf("Error unmarshal privatekey error: %v", err)
-		return
-	}
+	privKey := config.Global.GlobalPrivKey
 
 	senderSigSK, err := utils.DecodePrivateKey(privKey.SigSK)
 	if err != nil {

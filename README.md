@@ -63,7 +63,8 @@ $ ./jmessage_client -domain localhost -port 8080 -reg -username dorian -password
 $ ./jmessage_client -domain localhost -port 8080 -reg -username liu -password 1234
 ```
 
-Messaging
+#### Start Messaging
+
 If a user is already registered, you can log in without the -reg flag:
 . Ensure both clients are running and logged in to exchange messages.
 

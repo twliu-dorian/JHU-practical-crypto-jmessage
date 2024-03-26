@@ -14,12 +14,6 @@ import (
 	"jmessage_2024/config"
 )
 
-// PrettyPrint to print struct in a readable way
-// func PrettyPrint(i interface{}) string {
-// 	s, _ := json.MarshalIndent(i, "", "\t")
-// 	return string(s)
-// }
-
 func main() {
 
 	running := true

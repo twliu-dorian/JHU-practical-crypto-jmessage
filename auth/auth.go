@@ -121,10 +121,10 @@ func GeneratePublicKey() (config.PubKeyStruct, config.PrivKeyStruct, error) {
 	}
 	pubKey.SigPK = base64.StdEncoding.EncodeToString(sigPubKeyBytes)
 
-	println("Encryption Public Key:", pubKey.EncPK)
-	println("Signing Public Key:", pubKey.SigPK)
-	println("Encryption Private Key:", privKey.EncSK)
-	println("Signing Private Key:", privKey.SigSK)
+	// println("Encryption Public Key:", pubKey.EncPK)
+	// println("Signing Public Key:", pubKey.SigPK)
+	// println("Encryption Private Key:", privKey.EncSK)
+	// println("Signing Private Key:", privKey.SigSK)
 
 	return pubKey, privKey, nil
 }

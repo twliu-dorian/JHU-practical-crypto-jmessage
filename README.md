@@ -1,4 +1,6 @@
-# JMessage Overview
+# JMessage
+
+## Overview
 
 This repository contains code and specifications for the JMessage system.
 

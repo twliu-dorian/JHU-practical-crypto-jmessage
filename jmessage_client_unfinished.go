@@ -24,6 +24,7 @@ func main() {
 		fmt.Println("Fail to init client")
 		os.Exit(1)
 	}
+	err = config.CreateFolders()
 
 	// If we are registering a new username, let's do that first
 	if config.Global.DoUserRegister == true {

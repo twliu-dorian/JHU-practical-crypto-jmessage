@@ -4,6 +4,9 @@ import (
 	"crypto/tls"
 	"flag"
 	"fmt"
+	"io"
+	"log"
+	"os"
 
 	"net/http"
 	"strconv"
@@ -118,4 +121,41 @@ func SetAPIKey(apiKey string) (err error) {
 	ApiKey = new(APIKeyStruct)
 	ApiKey.APIkey = apiKey
 	return
+}
+
+func CreateFolders() (err error) {
+	plaintextFolderPath := Global.AttachmentsDir + "/plain"
+	err = os.MkdirAll(plaintextFolderPath, os.ModePerm)
+	if err != nil {
+		log.Fatalf("Failed to create folder: %s", err)
+	}
+	ciphertextFolderPath := Global.AttachmentsDir + "/cipher"
+	err = os.MkdirAll(ciphertextFolderPath, os.ModePerm)
+	if err != nil {
+		log.Fatalf("Failed to create folder: %s", err)
+	}
+	decrpytedPlain := Global.AttachmentsDir + "/decryptedPlain"
+	err = os.MkdirAll(decrpytedPlain, os.ModePerm)
+	if err != nil {
+		log.Fatalf("Failed to create folder: %s", err)
+	}
+
+	filePath := plaintextFolderPath + "/test.txt"
+
+	// Create the file or open it if it already exists
+	file, err := os.Create(filePath)
+	if err != nil {
+		log.Fatalf("Failed to create or open the file: %s", err)
+	}
+	defer file.Close() // Ensure the file is closed after writing is finished
+
+	// Text to write to the file
+	content := "This is a simple example of writing to a file in Go."
+
+	// Write the content to the file
+	_, err = io.WriteString(file, content)
+	if err != nil {
+		log.Fatalf("Failed to write to the file: %s", err)
+	}
+	return err
 }

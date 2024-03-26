@@ -35,8 +35,6 @@ func DownloadAttachments(messageArray []config.MessageStruct) {
 		matches := re.FindStringSubmatch(message)
 		if matches != nil && len(matches) > 0 {
 			messageArray[i].Url = matches[1]
-			fmt.Println("messageArray[i].Url:", messageArray[i].Url)
-
 			// Make a random filename
 			randBytes := make([]byte, 16)
 			if _, err := rand.Read(randBytes); err != nil {

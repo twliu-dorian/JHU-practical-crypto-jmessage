@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 
 	"os"
 	"strings"
@@ -43,11 +44,15 @@ func main() {
 	fmt.Print("Logging in to server... ")
 	newAPIkey, err := auth.ServerLogin(config.Global.Username, config.Global.Password)
 	if err != nil {
-		fmt.Println("Unable to connect to server, exiting.")
+		log.Fatalf("Unable to connect to server, exiting.")
 		os.Exit(1)
 	}
 	fmt.Println("success!")
 	err = config.SetAPIKey(newAPIkey)
+	if err != nil {
+		log.Fatalf("Fail to set api key")
+		os.Exit(1)
+	}
 
 	globalPubKey, globalPrivKey, err := auth.GeneratePublicKey()
 	if err != nil {

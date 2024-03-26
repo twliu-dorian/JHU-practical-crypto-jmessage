@@ -80,7 +80,7 @@ func DownloadFileFromServer(geturl string, localPath string) error {
 	}
 
 	// Create the file
-	fmt.Println("downloading file to local", localPath)
+	fmt.Println("downloading file to local")
 	out, err := os.Create(localPath)
 	if err != nil {
 		return err

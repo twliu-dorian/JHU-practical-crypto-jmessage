@@ -17,85 +17,6 @@ import (
 	"golang.org/x/crypto/chacha20"
 )
 
-// func decodePublicKey(base64PubKey string) (pubKey *ecdh.PublicKey, err error) {
-// 	pubKeyBytes, err := base64.StdEncoding.DecodeString(base64PubKey)
-// 	if err != nil {
-// 		log.Fatalf("Error base64 decoding recipient's key: %v", err)
-// 		return nil, err
-// 	}
-// 	pubKeyAny, err := x509.ParsePKIXPublicKey(pubKeyBytes)
-// 	if err != nil {
-// 		log.Fatalf("Error parsing pkcs8 public key: %v", err)
-// 		return nil, err
-// 	}
-
-// 	// switch ecdhPubKeyAny := ecdhPubKeyAny.(type) {
-// 	// case *rsa.PublicKey:
-// 	// 	fmt.Println("pub is of type RSA:", ecdhPubKeyAny)
-// 	// case *ecdsa.PublicKey:
-// 	// 	fmt.Println("pub is of type ECDSA:", ecdhPubKeyAny)
-// 	// case ed25519.PublicKey:
-// 	// 	fmt.Println("pub is of type Ed25519:", ecdhPubKeyAny)
-// 	// default:
-// 	// 	panic("unknown type of public key")
-// 	// }
-
-// 	ecdsaPubKey, ok := pubKeyAny.(*ecdsa.PublicKey)
-// 	if !ok {
-// 		log.Fatalf("not a ecdsa puclic key: %v", err)
-// 		return nil, err
-// 	}
-
-// 	pubKey, err = ecdsaPubKey.ECDH()
-// 	if err != nil {
-// 		log.Fatalf("Error converting ecdsa pubkey to ecdh: %v", err)
-// 		return nil, err
-// 	}
-
-// 	// publicKey, err = ecdh.P256().NewPublicKey(ecdhPubKey.Bytes())
-// 	// if err != nil {
-// 	// 	log.Fatalf("Error recipient's key is not P256: %v", err)
-// 	// 	return nil, err
-// 	// }
-// 	return pubKey, err
-// }
-
-// Function to decode the private signing key from BASE64
-// func decodePrivateKey(base64PrivKey string) (privKey *ecdsa.PrivateKey, err error) {
-// 	privKeyBytes, err := base64.StdEncoding.DecodeString(base64PrivKey)
-// 	if err != nil {
-// 		log.Fatalf("Error base64 decoding signing's key: %v", err)
-// 		return nil, err
-// 	}
-// 	block, _ := pem.Decode(privKeyBytes)
-// 	if block == nil || block.Type != "PRIVATE KEY" {
-// 		log.Fatal("Failed to decode PEM block containing private key")
-// 	}
-
-// 	// Now, block.Bytes contains the original byte slice of the private key (sigSKBytes)
-// 	sigSKBytes := block.Bytes
-
-// 	privKeyAny, err := x509.ParsePKCS8PrivateKey(sigSKBytes)
-// 	if err != nil {
-// 		log.Fatalf("Error parsing pkcs8 private key: %v", err)
-// 		return nil, err
-// 	}
-
-// 	privKey, ok := privKeyAny.(*ecdsa.PrivateKey)
-// 	if !ok {
-// 		log.Fatalf("not a ecdsa private key: %v", err)
-// 		return nil, err
-// 	}
-
-// 	// privKey, err = ecdsaPrivKey.ECDH()
-// 	// if err != nil {
-// 	// 	log.Fatalf("Error converting ecdsa pubkey to ecdh: %v", err)
-// 	// 	return nil, err
-// 	// }
-
-// 	return privKey, nil
-// }
-
 // Assuming a function signature like this to include the private key for signing:
 func EncryptMessage(message []byte, senderUsername string, recipientPubKey *config.PubKeyStruct) (messageEncrypted []byte, err error) {
 	/**
@@ -141,10 +62,8 @@ func EncryptMessage(message []byte, senderUsername string, recipientPubKey *conf
 
 	// The sender computes K = SHA256(ssk) where * represents scalar point multiplication. This key K will be used in the next section.
 	K := sha256.Sum256(ssk)
-	println("K", base64.StdEncoding.EncodeToString(K[:]))
 
 	senderPubKey := config.Global.GlobalPubKey
-	println("sender enc PK", senderPubKey.EncPK)
 
 	senderEncPK, err := utils.DecodePublicKey(senderPubKey.EncPK)
 	if err != nil {
@@ -194,7 +113,6 @@ func EncryptMessage(message []byte, senderUsername string, recipientPubKey *conf
 	Compute Sig
 	*/
 	toSign := c1 + c2 // Concatenating c1 and c2
-	println("toSign", toSign)
 
 	// Sign the string toSign using ECDSA with P-256
 	ecdasToSign := sha256.Sum256([]byte(toSign))
@@ -202,9 +120,6 @@ func EncryptMessage(message []byte, senderUsername string, recipientPubKey *conf
 	if err != nil {
 		log.Fatalf("Error signing the message: %v", err)
 	}
-
-	println("r", r.String())
-	println("s", s.String())
 
 	sig := r.Bytes()
 	sig = append(sig, s.Bytes()...) // Concatenate R and S components of the signature

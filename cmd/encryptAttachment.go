@@ -4,7 +4,6 @@ import (
 	"crypto/rand"
 	"crypto/sha256"
 	"encoding/base64"
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -51,7 +50,6 @@ func EncryptAttachment(plaintextFilePath string, ciphertextFilePath string) (str
 
 	// Step 4: Compute SHA256 hash of the encrypted file.
 	hash := sha256.Sum256(ciphertext)
-	fmt.Println("cipher text hash before sending:", base64.StdEncoding.EncodeToString(hash[:]))
 
 	// Step 5: Write the ciphertext to a new file.
 	if err := os.WriteFile(ciphertextFilePath, ciphertext, 0644); err != nil {

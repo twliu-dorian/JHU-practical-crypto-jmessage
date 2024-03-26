@@ -13,7 +13,6 @@ import (
 	"jmessage_2024/utils"
 	"log"
 	"math/big"
-	"os"
 
 	"golang.org/x/crypto/chacha20"
 )
@@ -54,7 +53,7 @@ func DecryptMessage(payload string, senderUsername string, senderPubKey *config.
 	if verifySignature(senderSigPK, ecdsaToVerify[:], sigBytes) {
 		fmt.Println("Signature verified!")
 	} else {
-		fmt.Println("Signature verification failed.")
+		log.Fatalf("Signature verification failed.")
 	}
 
 	K, err := decodeC1ObtainK(ciphertext.C1)
@@ -69,7 +68,6 @@ func DecryptMessage(payload string, senderUsername string, senderPubKey *config.
 	if string(sender) != senderUsername {
 		fmt.Printf("origin sender %s, received sender, %s", senderUsername, string(sender))
 		log.Fatalf("sender is not the origin sender %v", err)
-		os.Exit(1)
 	}
 
 	return message, err
@@ -140,7 +138,6 @@ func decodeC1ObtainK(base64C1 string) (K [32]byte, err error) {
 	}
 	K = sha256.Sum256(ssk)
 
-	println("K", base64.StdEncoding.EncodeToString(K[:]))
 	return K, err
 }
 

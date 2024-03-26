@@ -20,18 +20,18 @@ import (
 // Assuming a function signature like this to include the private key for signing:
 func EncryptMessage(message []byte, senderUsername string, recipientPubKey *config.PubKeyStruct) (messageEncrypted []byte, err error) {
 	/**
-		encPK, sP: recipient's public key
-		c: random scalar value, sender's encSK
-		cP, epk: ephemeral public key, encPK
-		csP: shared secret
-		s: recipients encSK
-		sP: recipients encPK
-		ssk: shared secret key
-		K: secret key = sha256(ssk)
-		c1: encoded emphemeral public key
-	/
+	encPK, sP: recipient's public key
+	c: random scalar value, sender's encSK
+	cP, epk: ephemeral public key, encPK
+	s: recipients encSK
+	sP: recipients encPK
+	ssk, csP: shared secret (key)
+	K: secret key = sha256(ssk)
+	c1: encoded emphemeral public key
+	*/
+
 	/**
-		Compute c1 and K
+	Compute c1 and K
 	*/
 	privKey := config.Global.GlobalPrivKey
 
@@ -129,7 +129,7 @@ func EncryptMessage(message []byte, senderUsername string, recipientPubKey *conf
 
 	// Now you have c1, c2, and Sig, you can return them or do further processing
 	// For demonstration, let's just log them and return an example byte slice
-	log.Printf("c1: %s\nc2: %s\nSig: %s", c1, c2, Sig)
+	// log.Printf("c1: %s\nc2: %s\nSig: %s", c1, c2, Sig)
 
 	payload := config.CiphertextStruct{
 		C1:  c1,

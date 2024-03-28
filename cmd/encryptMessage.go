@@ -1,8 +1,6 @@
 package cmd
 
 import (
-	"crypto/ecdsa"
-	"crypto/rand"
 	"crypto/sha256"
 	"crypto/x509"
 	"encoding/base64"
@@ -34,11 +32,6 @@ func EncryptMessage(message []byte, senderUsername string, recipientPubKey *conf
 	Compute c1 and K
 	*/
 	privKey := config.Global.GlobalPrivKey
-
-	senderSigSK, err := utils.DecodePrivateKey(privKey.SigSK)
-	if err != nil {
-		log.Fatalf("Error decoding the ecdsa private key: %v", err)
-	}
 
 	senderEncSK, err := utils.DecodeECDHPrivateKey(privKey.EncSK)
 	if err != nil {
@@ -115,14 +108,7 @@ func EncryptMessage(message []byte, senderUsername string, recipientPubKey *conf
 	toSign := c1 + c2 // Concatenating c1 and c2
 
 	// Sign the string toSign using ECDSA with P-256
-	ecdasToSign := sha256.Sum256([]byte(toSign))
-	r, s, err := ecdsa.Sign(rand.Reader, senderSigSK, ecdasToSign[:])
-	if err != nil {
-		log.Fatalf("Error signing the message: %v", err)
-	}
-
-	sig := r.Bytes()
-	sig = append(sig, s.Bytes()...) // Concatenate R and S components of the signature
+	sig := ECDSASign([]byte(toSign), privKey)
 
 	// Encode the resulting signature using BASE64
 	Sig := base64.StdEncoding.EncodeToString(sig)

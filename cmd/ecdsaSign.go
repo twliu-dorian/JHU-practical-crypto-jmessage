@@ -12,7 +12,7 @@ import (
 func ECDSASign(message []byte, privKey config.PrivKeyStruct) []byte {
 	// TODO: IMPLEMENT
 
-	senderSigSK, err := utils.DecodePrivateKey(privKey.SigSK)
+	senderSigSK, err := utils.DecodePrivateSigningKey(privKey.SigSK)
 	if err != nil {
 		log.Fatalf("Error decoding the ecdsa private key: %v", err)
 	}

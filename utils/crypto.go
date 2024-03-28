@@ -35,7 +35,7 @@ func DecodePublicKey(base64PubKey string) (pubKey *ecdh.PublicKey, err error) {
 	return pubKey, err
 }
 
-func DecodePrivateKey(base64PrivKey string) (privKey *ecdsa.PrivateKey, err error) {
+func DecodePrivateSigningKey(base64PrivKey string) (privKey *ecdsa.PrivateKey, err error) {
 	privKeyBytes, err := base64.StdEncoding.DecodeString(base64PrivKey)
 	if err != nil {
 		log.Fatalf("Error base64 decoding signing's key: %v", err)
@@ -53,12 +53,6 @@ func DecodePrivateKey(base64PrivKey string) (privKey *ecdsa.PrivateKey, err erro
 		log.Fatalf("not a ecdsa private key: %v", err)
 		return nil, err
 	}
-
-	// privKey, err = ecdsaPrivKey.ECDH()
-	// if err != nil {
-	// 	log.Fatalf("Error converting ecdsa pubkey to ecdh: %v", err)
-	// 	return nil, err
-	// }
 
 	return privKey, nil
 }

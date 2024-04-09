@@ -53,7 +53,9 @@ func DecryptMessage(payload string, senderUsername string, senderPubKey *config.
 	if verifySignature(senderSigPK, ecdsaToVerify[:], sigBytes) {
 		fmt.Println("Signature verified!")
 	} else {
-		log.Fatalf("Signature verification failed.")
+		fmt.Println("Signature verification failed.")
+		// log.Fatalf("Signature verification failed.")
+		return nil, err
 	}
 
 	K, err := decodeC1ObtainK(ciphertext.C1)
@@ -63,11 +65,13 @@ func DecryptMessage(payload string, senderUsername string, senderPubKey *config.
 
 	sender, message, err := decryptC2(ciphertext.C2, K)
 	if err != nil {
-		log.Fatalf("Failed to decrypt C2 %v", err)
+		// log.Fatalf("Failed to decrypt C2 %v", err)
+		fmt.Printf("Failed to decrypt C2 %v", err)
 	}
 	if string(sender) != senderUsername {
 		fmt.Printf("origin sender %s, received sender, %s", senderUsername, string(sender))
-		log.Fatalf("sender is not the origin sender %v", err)
+		// log.Fatalf("sender is not the origin sender %v", err)
+		return nil, err
 	}
 
 	return message, err
@@ -170,23 +174,30 @@ func decryptC2(c2 string, K [32]byte) (senderUsername []byte, message []byte, er
 	check := binary.LittleEndian.Uint32(checkBytes)
 	calculatedCheck := crc32.ChecksumIEEE(decrypted)
 
-	if check != calculatedCheck {
-		log.Fatalf("CRC32 CHECK mismatch, message integrity could not be verified")
-		return nil, nil, err
-	}
+	// fix back
+	fmt.Printf("origin    crc32: %x\n", check)
+	fmt.Printf("decrypted crc32: %x\n", calculatedCheck)
+
+	// if check != calculatedCheck {
+	// 	log.Fatalf("CRC32 CHECK mismatch, message integrity could not be verified")
+	// 	return nil, nil, err
+	// }
 
 	// Step 4: Extract the Original Message and Sender Username
 	separatorIndex := -1
+
+	fmt.Printf("decrypted message: %s\n", string(decrypted))
 	for i, b := range decrypted {
 		if b == 0x3A { // ':' separator
 			separatorIndex = i
+			fmt.Printf("ascii: %x\n", decrypted[i])
 			break
 		}
 	}
 
 	if separatorIndex == -1 {
-		log.Fatalf("Separator not found in decrypted message")
-		return nil, nil, err
+		fmt.Printf("Separator not found in decrypted message\n")
+		return senderUsername, message, err
 	}
 
 	senderUsername = decrypted[:separatorIndex]

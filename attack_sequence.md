@@ -52,6 +52,11 @@ H = B xor :
 ### CRC32 fix
 
 1. Use the CRC linear property: CRC(0) xor CRC(X) xor CRC(Y) = CRC(X xor Y)
+
+```
+X looks like:
+```
+
 2. len(CRC(0)) = max(len(CRC(X), len(CRC(Y)))
 3. 0 = hex(0x00, 0x00, ...)
 4. X is original plain text(M') = (username || 0x3A || M)

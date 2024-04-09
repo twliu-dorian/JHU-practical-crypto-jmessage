@@ -1,24 +1,24 @@
 # JMessage Specification
 
-This specification defines the cryptographic and binary interface for an end-to-end encrypted messaging application. 
+This specification defines the cryptographic and binary interface for an end-to-end encrypted messaging application.
 A JMessage implementation consists of a server and one or more clients that interoperate to send encrypted messages
-and file attachments. 
+and file attachments.
 
 JMessage was designed for teaching purposes, and hence it was deliberately designed to include potentially vulnerable, obsolete cryptography. While you are free to expand on the current design and improve it, you should not use this for
 critical data.
 
 ## Overview
 
-A JMessage deployment consists of two components: (1) a JMessage server, and (2) one or more JMessage clients, 
-which interoperate with the server to exchange messages with other clients. Each JMessage client generates its own cryptographic keypairs 
-internally; the secret keys never leave the client. All messages are encrypted end-to-end to the receiving clients. 
+A JMessage deployment consists of two components: (1) a JMessage server, and (2) one or more JMessage clients,
+which interoperate with the server to exchange messages with other clients. Each JMessage client generates its own cryptographic keypairs
+internally; the secret keys never leave the client. All messages are encrypted end-to-end to the receiving clients.
 This design ensures that even a curious server operator will not not see the content of the messages.
 
-**The JMessage Client.** Each JMessage client interacts with the server using an HTTPS-based RESTful API. It is responsible for 
-interacting with the user, generating cryptographic keys, encrypting messages sent to other users, and decrypting messages 
+**The JMessage Client.** Each JMessage client interacts with the server using an HTTPS-based RESTful API. It is responsible for
+interacting with the user, generating cryptographic keys, encrypting messages sent to other users, and decrypting messages
 received from other users. The client may also display information such as the cryptographic key fingerprint of another user.
 
-**The JMessage Server.** The JMessage server does not implement any cryptographic functions except for realizing an HTTPS-secured 
+**The JMessage Server.** The JMessage server does not implement any cryptographic functions except for realizing an HTTPS-secured
 connection. It interacts with the clients via HTTPS to provide a simple API for the following functions:
 
 1. Signup/registration of new user IDs
@@ -26,16 +26,16 @@ connection. It interacts with the clients via HTTPS to provide a simple API for 
 3. Uploading public keys
 4. Public key lookup
 5. Message upload to a mailbox
-7. Retrieval of mailbox contents
-8. Attachment upload
-9. Retrieval of attachments
+6. Retrieval of mailbox contents
+7. Attachment upload
+8. Retrieval of attachments
 
-The reference implementation of the JMessage server is written as a Python/Flask application; a copy of the source and usage instructions can be found in the main repository so you can run it yourself. The instructors will also 
+The reference implementation of the JMessage server is written as a Python/Flask application; a copy of the source and usage instructions can be found in the main repository so you can run it yourself. The instructors will also
 provide a master copy of the server so that the class can use this to interact with each other.
 
 ## A typical JMessage interaction (informative)
 
-Full details of the JMessage specification are given in later sections. This section gives a brief overview of what a JMessage interaction looks like. 
+Full details of the JMessage specification are given in later sections. This section gives a brief overview of what a JMessage interaction looks like.
 
 Each JMessage client must register a username and password with the server. It then subsequently generates and
 uploads a public key for encryption. More concretely:
@@ -48,18 +48,18 @@ uploads a public key for encryption. More concretely:
 JMessage messages can have three formats:
 
 1. A standard message contains encrypted unstructured text.
-2. An *attachment message* contains encrypted text embedding the URL of an attachment file, as well as a decryption key and file hash.
-3. A *read receipt* message contains no encrypted material. It indicates that a message was received and decrypted by a counterparty.
+2. An _attachment message_ contains encrypted text embedding the URL of an attachment file, as well as a decryption key and file hash.
+3. A _read receipt_ message contains no encrypted material. It indicates that a message was received and decrypted by a counterparty.
 
 To send an encrypted message:
 
 1. The sender's client calls the server to obtain the recipient's public key (`/lookupKey/`).
-4. The sender encrypts their message using the recipient's public key, then signs it.
-5. The sender uploads the BASE64-encoded ciphertext (`/sendMessage/`).
-6. At a later point, the recipient downloads a list of new messages (`/getMessages/`).
-7. For each message, the recipient decrypts the message and verifies the sender's signature.
-9. The recipient sends back a read-receipt message for each _correctly-decrypted_ (non-read-receipt) message.
-10. The server deletes all downloaded messages.
+2. The sender encrypts their message using the recipient's public key, then signs it.
+3. The sender uploads the BASE64-encoded ciphertext (`/sendMessage/`).
+4. At a later point, the recipient downloads a list of new messages (`/getMessages/`).
+5. For each message, the recipient decrypts the message and verifies the sender's signature.
+6. The recipient sends back a read-receipt message for each _correctly-decrypted_ (non-read-receipt) message.
+7. The server deletes all downloaded messages.
 
 Attachments are included as follows:
 
@@ -70,9 +70,9 @@ Attachments are included as follows:
 
 ## Interacting with the JMessage server
 
-The JMessage server supports several functions: new user signup, public key registration, public key lookup, message delivery, message lookup, 
-attachment upload, attachment lookup, as well as a function to list all registered usernames. Requests and responses are transmitted using standard HTTP GET 
-or POST requests with JSON encoding used to transmit data structures. The demo server will include a valid HTTPS certificate, but when using your own 
+The JMessage server supports several functions: new user signup, public key registration, public key lookup, message delivery, message lookup,
+attachment upload, attachment lookup, as well as a function to list all registered usernames. Requests and responses are transmitted using standard HTTP GET
+or POST requests with JSON encoding used to transmit data structures. The demo server will include a valid HTTPS certificate, but when using your own
 test servers you will need to disable certificate verification at the client.
 
 ### User signup
@@ -83,7 +83,7 @@ To register a new user account, issue a GET request with the following structure
 /registerUser/<username>/<password>
 ```
 
-The parameters `<username>` and `<password>` represent the username and assigned password for this account. If the account already exists, 
+The parameters `<username>` and `<password>` represent the username and assigned password for this account. If the account already exists,
 the server will return HTTP response 409 (CONFLICT). Otherwise it will return HTTP response code 200 (SUCCESS).
 
 There is currently no way to remove accounts or change passwords.
@@ -96,8 +96,8 @@ To log in to the server with a registered username and password, issue a GET req
 /login/<username>/<password>
 ```
 
-The parameters `<username>` and `<password>` represent the username and assigned password for this account. If the credentials are 
-invalid, the server will return HTTP response code 401 (UNAUTHORIZED). If the credentials are valid, the server will return HTTP 
+The parameters `<username>` and `<password>` represent the username and assigned password for this account. If the credentials are
+invalid, the server will return HTTP response code 401 (UNAUTHORIZED). If the credentials are valid, the server will return HTTP
 response code 200 (SUCCESS) and the following JSON structure:
 
 ```
@@ -106,8 +106,8 @@ response code 200 (SUCCESS) and the following JSON structure:
 }
 ```
 
-Here `<APIKeyValue>` is an alphanumeric API string that you will pass to the server for all subsequent operations. The server will 
-retain this value in its memory until it reboots or times out the login session, at which point you will need to execute the login command again. 
+Here `<APIKeyValue>` is an alphanumeric API string that you will pass to the server for all subsequent operations. The server will
+retain this value in its memory until it reboots or times out the login session, at which point you will need to execute the login command again.
 You are allowed repeat server login as many times as you want, even if you are already logged in.
 
 ### User listing
@@ -118,7 +118,7 @@ To obtain a JSON list of all user accounts, issue a GET request with the followi
 /listUsers
 ```
 
-This will return a JSON list of all users on the system, each containing the fields ``(username, creationTime, lastCheckedTime)``. The latter
+This will return a JSON list of all users on the system, each containing the fields `(username, creationTime, lastCheckedTime)`. The latter
 two arguments are UNIX-style timestamps.
 
 ```
@@ -154,57 +154,57 @@ The public key content is a `pubkey` JSON object uploaded via POST. It contains 
 }
 ```
 
-Each field should contain a BASE64-encoded public key for (respectively) encryption and signature verification. Any previous public 
+Each field should contain a BASE64-encoded public key for (respectively) encryption and signature verification. Any previous public
 key registered to the account will be overwritten. The server will return HTTP response 401 (UNAUTHORIZED) if the credentials
 are incorrect. Otherwise it will return HTTP response code 200 (SUCCESS).
 
 ### Public key lookup
 
-Any user can look up the public key associated with a user account. This does not require the caller to be logged in. To obtain a public 
+Any user can look up the public key associated with a user account. This does not require the caller to be logged in. To obtain a public
 key, issue a GET request with the following structure:
 
 ```
 /lookupKey/<username_to_lookup>
 ```
 
-Here `<username_to_lookup>` contains the username of the user to be looked up. This call will return a `pubkey` object with the structure given 
-in the previous section, or it will return an HTTP error response 404 (NOT FOUND) if the user is not identified, or if the user has not 
+Here `<username_to_lookup>` contains the username of the user to be looked up. This call will return a `pubkey` object with the structure given
+in the previous section, or it will return an HTTP error response 404 (NOT FOUND) if the user is not identified, or if the user has not
 uploaded a public key.
 
 ### Message upload
 
-A registered user can upload a new message to another user. Messages must be BASE64-encoded and have a size limit of 
+A registered user can upload a new message to another user. Messages must be BASE64-encoded and have a size limit of
 2048 bytes in BASE64 encoding. To upload a message, issue a POST request with the following structure:
 
 ```
 /sendMessage/<username>/<apikey>
 ```
 
-As before, `<username>` contains the username of the sender and `<apikey>` their password. 
+As before, `<username>` contains the username of the sender and `<apikey>` their password.
 
 The message content is a `message` JSON object uploaded via POST, and it has the following fields:
 
-* `from`: Sender username (string). _This must exactly match the username given in the POST request._
-* `to`: Receipient username (string).
-* `id`: Message identifier (integer), must not repeat for a given sender.
-* `receiptID`: 0 for standard messages. If the message is a read-receipt, this will identify which message it references (integer).
-* `payload`: JSON payload of the message (base64-encoded JSON object containing fields `C1`, `C2`, `Sig`). Empty for read-receipts.
+- `from`: Sender username (string). _This must exactly match the username given in the POST request._
+- `to`: Receipient username (string).
+- `id`: Message identifier (integer), must not repeat for a given sender.
+- `receiptID`: 0 for standard messages. If the message is a read-receipt, this will identify which message it references (integer).
+- `payload`: JSON payload of the message (base64-encoded JSON object containing fields `C1`, `C2`, `Sig`). Empty for read-receipts.
 
-The message identifier `id` is an integer chosen by the sending party. For messages containing encrypted content, the `receipt` field should 
-be set to `0`, and the `payload` field should contain a ciphertext. For read-receipt messages, the `receipt` field should contain the message 
-ID of the message being acknowledged, and `payload` should be set to `null`. 
+The message identifier `id` is an integer chosen by the sending party. For messages containing encrypted content, the `receipt` field should
+be set to `0`, and the `payload` field should contain a ciphertext. For read-receipt messages, the `receipt` field should contain the message
+ID of the message being acknowledged, and `payload` should be set to `null`.
 
 Clients should always send read-receipts in response to valid encrypted messages. However, they should never transmit a receipt if message
 decryption fails, or in response to another read-receipt message.
 
-If the recipient cannot be located, this call returns HTTP error response 404 (NOT FOUND). If the  user's mailbox is full, this call 
+If the recipient cannot be located, this call returns HTTP error response 404 (NOT FOUND). If the user's mailbox is full, this call
 returns HTTP error response 429 (TOO_MANY_REQUESTS).
 
 Attachment messages will contain the encrypted string `>>>MSGURL=<url>` where `<url>` points to an encrypted attachment URL.
 
 ### Message retrieval
 
-A registered user can request a list of all messages waiting in their mailbox. Once requested, the messages 
+A registered user can request a list of all messages waiting in their mailbox. Once requested, the messages
 will be deleted from the mailbox.
 
 ```
@@ -215,7 +215,7 @@ Messages are returned as an array of JSON structures identical to the structures
 
 ### Attachment upload
 
-A registered user can upload a file to the server at a temporary URL. To do this, the client makes 
+A registered user can upload a file to the server at a temporary URL. To do this, the client makes
 a form POST request with the following structure:
 
 ```
@@ -229,7 +229,7 @@ An example of the raw data for a file is included below:
 b'--c5df8a4935bda876fa80dab56e1da8ece5f3f48cbaa7e955a42c63d33450\r\nContent-Disposition: form-data; name="filefield"; filename="test.txt"\r\nContent-Type: application/octet-stream\r\n\r\nThis is a test file!\n\r\n--c5df8a4935bda876fa80dab56e1da8ece5f3f48cbaa7e955a42c63d33450--\r\n'
 ```
 
-There is a maximum file size of 100 KB. Once the file is accepted, the server will generate a unique file path of the form 
+There is a maximum file size of 100 KB. Once the file is accepted, the server will generate a unique file path of the form
 `/<username>/<random filename>.dat` and return status code 200. This path will be returned in a JSON object with the following structure:
 
 ```
@@ -263,10 +263,10 @@ The string `<path>` will contain the path returned by the `uploadFile` call. Thi
 
 JMessage uses three cryptographic primitives: Elliptic Curve Diffie-Hellman with the NIST P-256 curve, ChaCha20 encryption and ECDSA signing using the P-256 elliptic curve.
 
-Each client is responsible for generating and maintaining two long-term keypairs: a P-256 elliptic curve keypair `encPK, encSK` and a P-256 ECDSA signing keypair `sigPK, sigSK`. These keys may be generated each time the client starts up, or the client may generate them one time and store the keys 
+Each client is responsible for generating and maintaining two long-term keypairs: a P-256 elliptic curve keypair `encPK, encSK` and a P-256 ECDSA signing keypair `sigPK, sigSK`. These keys may be generated each time the client starts up, or the client may generate them one time and store the keys
 persistently on disk. The public keys `encPK, sigPK` are encoded to binary octet-strings using standard encodings described further below. They are then individually BASE64-encoded and sent to the server as a JSON structure. The secret keys are never sent to the server.
 
-The encryption procedure is described in the following section. The output of the procedure is three binary octet strings `C1`, `C2`, `Sig`. These are subsequently encoded using BASE64 and placed into a JSON structure as follows. This structure forms the `payload` component used in message upload and download. 
+The encryption procedure is described in the following section. The output of the procedure is three binary octet strings `C1`, `C2`, `Sig`. These are subsequently encoded using BASE64 and placed into a JSON structure as follows. This structure forms the `payload` component used in message upload and download.
 
 ```
 {
@@ -286,13 +286,13 @@ To generate a new set of client keys. Let `P` be the generator of P-256 subgroup
 `q` is the order of `P`. We use the notation `xP` or `x*P` to indicate [scalar point multiplication](https://en.wikipedia.org/wiki/Elliptic_curve_point_multiplication) of `P` by the scalar `x`.
 
 1. Generate a random scalar `a` between `0` and `q-1` (inclusive).
-2. Use [PKCS8 encoding (Section 5)](https://datatracker.ietf.org/doc/html/rfc5208#section-5)* to encode `a` as `encSK`.
-3. Compute `pk = aP`. Use [RFC 5208, Section 4.1](https://www.rfc-editor.org/rfc/rfc5280.html#section-4.1))* to encode `pk` as `encPK`.
+2. Use [PKCS8 encoding (Section 5)](https://datatracker.ietf.org/doc/html/rfc5208#section-5)\* to encode `a` as `encSK`.
+3. Compute `pk = aP`. Use [RFC 5208, Section 4.1](https://www.rfc-editor.org/rfc/rfc5280.html#section-4.1))\* to encode `pk` as `encPK`.
 4. Generate a random scalar `b` between `0` and `q-1` (inclusive).
-5. Use [PKCS8 encoding (Section 5)](https://datatracker.ietf.org/doc/html/rfc5208#section-5)* to encode `b` as `sigSK`.
-6. Compute `vk = bP`. Use [RFC 5208, Section 4.1](https://www.rfc-editor.org/rfc/rfc5280.html#section-4.1))* to encode `vk` as `sigPK`.
+5. Use [PKCS8 encoding (Section 5)](https://datatracker.ietf.org/doc/html/rfc5208#section-5)\* to encode `b` as `sigSK`.
+6. Compute `vk = bP`. Use [RFC 5208, Section 4.1](https://www.rfc-editor.org/rfc/rfc5280.html#section-4.1))\* to encode `vk` as `sigPK`.
 
-* Note: both PKCS8 private key encoding and RFC 5208 public key encoding are implemented by default in the [Go ECDH package](https://pkg.go.dev/crypto/ecdh) within the PublicKey and PrivateKey classes, and we recommend using this implementation.
+- Note: both PKCS8 private key encoding and RFC 5208 public key encoding are implemented by default in the [Go ECDH package](https://pkg.go.dev/crypto/ecdh) within the PublicKey and PrivateKey classes, and we recommend using this implementation.
 
 ### Encrypting messages
 
@@ -303,9 +303,9 @@ Compute `C1` and `K`:
 1. The sender decodes `encPK` as a point on the P-256 elliptic curve.
 2. The sender generates a random scalar `c` between `0` and `q-1` (inclusive).
 3. The sender computes `epk = cP` using scalar point multiplication.
-4. The sender computes `ssk = c*encPK` where * represents scalar point multiplication, and encodes the x-coordinate according to SEC 1, Version 2.0, Section 2.3.5. (NB: This is natively implemented as the ECDH() method in Go's crypto.ecdh.)
-// Version 2.0, Section 2.3.5.
-5. The sender computes `K = SHA256(ssk)` where * represents scalar point multiplication. This key `K` will be used in the next section.
+4. The sender computes `ssk = c*encPK` where \* represents scalar point multiplication, and encodes the x-coordinate according to SEC 1, Version 2.0, Section 2.3.5. (NB: This is natively implemented as the ECDH() method in Go's crypto.ecdh.)
+   // Version 2.0, Section 2.3.5.
+5. The sender computes `K = SHA256(ssk)` where \* represents scalar point multiplication. This key `K` will be used in the next section.
 6. The sender encodes `epk` into the value `C1`, by first encoding it using [RFC 5208, Section 4.1](https://www.rfc-editor.org/rfc/rfc5280.html#section-4.1) and then BASE64-encoding the result.
 
 Compute `C2`:
@@ -338,7 +338,7 @@ Decrypt `C1` to obtain `K`:
 
 1. The recipient BASE64-decodes `C1` as a point on P-256.
 2. The recipient decodes `encSK` as a scalar `s` between `0` and `q-1` (inclusive).
-3. The recipient computes `K = SHA256(s * C1)` where * represents scalar point multiplication.
+3. The recipient computes `K = SHA256(s * C1)` where \* represents scalar point multiplication.
 
 Decrypt `C2` to obtain the plaintext:
 
@@ -351,7 +351,7 @@ Decrypt `C2` to obtain the plaintext:
 
 ### Sending read receipts
 
-Once a client has successfully decrypted an encrypted message or attachment message, it should send a read receipt back to the sender. Read receipts do not involve any cryptography or encrypted message payload. 
+Once a client has successfully decrypted an encrypted message or attachment message, it should send a read receipt back to the sender. Read receipts do not involve any cryptography or encrypted message payload.
 
 _Note that clients should send a read receipt message only when decryption has succeeded on an incoming message, and the incoming message is not itself a read receipt!_
 

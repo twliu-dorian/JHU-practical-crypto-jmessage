@@ -4,3 +4,5 @@ jmessage_client
 /JMESSAGE_FILES
 /INTERCEPTED_MESSAGES
 /JMESSAGE_DOWNLOADS
+# attack_sequence.md
+cipher.json

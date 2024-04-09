@@ -108,10 +108,10 @@ func EncryptMessage(message []byte, senderUsername string, recipientPubKey *conf
 	toSign := c1 + c2 // Concatenating c1 and c2
 
 	// Sign the string toSign using ECDSA with P-256
-	sig := ECDSASign([]byte(toSign), privKey)
+	sigBytes := ECDSASign([]byte(toSign), privKey)
 
 	// Encode the resulting signature using BASE64
-	Sig := base64.StdEncoding.EncodeToString(sig)
+	sig := base64.StdEncoding.EncodeToString(sigBytes)
 
 	// Now you have c1, c2, and Sig, you can return them or do further processing
 	// For demonstration, let's just log them and return an example byte slice
@@ -120,7 +120,7 @@ func EncryptMessage(message []byte, senderUsername string, recipientPubKey *conf
 	payload := config.CiphertextStruct{
 		C1:  c1,
 		C2:  c2,
-		Sig: Sig,
+		Sig: sig,
 	}
 
 	payloadBytes, err := json.Marshal(payload)

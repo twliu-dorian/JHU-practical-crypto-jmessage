@@ -1,0 +1,388 @@
+Running command: ./jmessage_client -domain localhost -port 8080 -headless -username alice -password 1234
+Security warning: TLS certificate validation is disabled!
+Security warning: TLS certificate validation is disabled!
+Logging in to server... success!
+Jmessage Go Client, enter command or help
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+Signature verified!
+origin    crc32: e9c21f48
+decrypted crc32: e9c21f48
+charlie:hii
+ ascii: 3a
+You have 1 new messages
+-----------------------------
+
+From: charlie
+
+Message: hii
+
+-----------------------------
+
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+Signature verified!
+origin    crc32: 6be54145
+decrypted crc32: d14300b7
+Separator not found in decrypted message
+origin sender charliea, received sender, You have 1 new messages
+-----------------------------
+
+From: charliea
+
+Message: 
+-----------------------------
+
+You have no new messages.
+You have no new messages.
+Signature verified!
+origin    crc32: a74f41db
+decrypted crc32: 1de90029
+Separator not found in decrypted message
+origin sender charliea, received sender, You have 1 new messages
+-----------------------------
+
+From: charliea
+
+Message: 
+-----------------------------
+
+You have no new messages.
+You have no new messages.
+Signature verified!
+origin    crc32: 29c04638
+decrypted crc32: 936607ca
+Separator not found in decrypted message
+origin sender charliea, received sender, You have 1 new messages
+-----------------------------
+
+From: charliea
+
+Message: 
+-----------------------------
+
+You have no new messages.
+Signature verified!
+origin    crc32: e56a46a6
+decrypted crc32: 5fcc0754
+Separator not found in decrypted message
+origin sender charliea, received sender, You have 1 new messages
+-----------------------------
+
+From: charliea
+
+Message: 
+-----------------------------
+
+You have no new messages.
+You have no new messages.
+Signature verified!
+origin    crc32: efaf4fbf
+decrypted crc32: 55090e4d
+Separator not found in decrypted message
+origin sender charliea, received sender, You have 1 new messages
+-----------------------------
+
+From: charliea
+
+Message: 
+-----------------------------
+
+You have no new messages.
+You have no new messages.
+Signature verified!
+origin    crc32: 23054f21
+decrypted crc32: 99a30ed3
+Separator not found in decrypted message
+origin sender charliea, received sender, You have 1 new messages
+-----------------------------
+
+From: charliea
+
+Message: 
+-----------------------------
+
+You have no new messages.
+You have no new messages.
+Signature verified!
+origin    crc32: ad8a48c2
+decrypted crc32: 172c0930
+Separator not found in decrypted message
+origin sender charliea, received sender, You have 1 new messages
+-----------------------------
+
+From: charliea
+
+Message: 
+-----------------------------
+
+You have no new messages.
+You have no new messages.
+Signature verified!
+origin    crc32: 6120485c
+decrypted crc32: db8609ae
+Separator not found in decrypted message
+origin sender charliea, received sender, You have 1 new messages
+-----------------------------
+
+From: charliea
+
+Message: 
+-----------------------------
+
+You have no new messages.
+You have no new messages.
+Signature verified!
+origin    crc32: b8005af0
+decrypted crc32: 2a61b02
+Separator not found in decrypted message
+origin sender charliea, received sender, You have 1 new messages
+-----------------------------
+
+From: charliea
+
+Message: 
+-----------------------------
+
+You have no new messages.
+You have no new messages.
+Signature verified!
+origin    crc32: 74aa5a6e
+decrypted crc32: ce0c1b9c
+Separator not found in decrypted message
+origin sender charliea, received sender, You have 1 new messages
+-----------------------------
+
+From: charliea
+
+Message: 
+-----------------------------
+
+You have no new messages.
+You have no new messages.
+Signature verified!
+origin    crc32: fa255d8d
+decrypted crc32: 40831c7f
+Separator not found in decrypted message
+origin sender charliea, received sender, You have 1 new messages
+-----------------------------
+
+From: charliea
+
+Message: 
+-----------------------------
+
+You have no new messages.
+Signature verified!
+origin    crc32: 368f5d13
+decrypted crc32: 8c291ce1
+Separator not found in decrypted message
+origin sender charliea, received sender, You have 1 new messages
+-----------------------------
+
+From: charliea
+
+Message: 
+-----------------------------
+
+You have no new messages.
+You have no new messages.
+Signature verified!
+origin    crc32: 3c4a540a
+decrypted crc32: 86ec15f8
+Separator not found in decrypted message
+origin sender charliea, received sender, You have 1 new messages
+-----------------------------
+
+From: charliea
+
+Message: 
+-----------------------------
+
+You have no new messages.
+You have no new messages.
+Signature verified!
+origin    crc32: f0e05494
+decrypted crc32: 4a461566
+Separator not found in decrypted message
+origin sender charliea, received sender, You have 1 new messages
+-----------------------------
+
+From: charliea
+
+Message: 
+-----------------------------
+
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.
+You have no new messages.

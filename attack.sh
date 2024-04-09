@@ -8,8 +8,7 @@ ATTACH_DIR="./JMESSAGE_DOWNLOADS"
 DOMAIN="localhost"
 PASSWORD="1234"
 PORT=8080
-# USERNAME="alice"
-USERNAME="charlie"
+USERNAME="attacker"
 
 # Add boolean flags as needed. Uncomment to enable.
 NOTLS="-notls" # Uncomment this line to use HTTP
@@ -18,12 +17,12 @@ REG="-reg"             # Uncomment to register a new username and password
 STRICTTLS="-stricttls" # Uncomment to disallow self-signed certificates
 
 # Construct the command with all flags
-CMD_REG="$EXECUTABLE -domain $DOMAIN -port $PORT $REG -username $USERNAME -password $PASSWORD"
+CMD_REG="$EXECUTABLE -domain $DOMAIN -port $PORT $REG -username $USERNAME -password $PASSWORD "
 CMD_LOGIN="$EXECUTABLE -domain $DOMAIN -port $PORT -username $USERNAME -password $PASSWORD"
 
 # Run the command
-# CMD=$CMD_REG
-CMD=$CMD_LOGIN
+CMD=$CMD_REG
+# CMD=$CMD_LOGIN
 
 echo "Running command: $CMD"
 $CMD

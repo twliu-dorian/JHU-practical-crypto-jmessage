@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 )
 
@@ -41,7 +40,7 @@ func DoGetRequest(getURL string) (int, []byte, error) {
 func DoPostRequest(postURL string, postContents []byte) (int, []byte, error) {
 	// Initialize a client
 	client := &http.Client{}
-	log.Printf("Request body: %s\n", string(postContents))
+	// log.Printf("Request body: %s\n", string(postContents))
 	req, err := http.NewRequest("POST", postURL, bytes.NewBuffer(postContents))
 	if err != nil {
 		return 0, nil, err

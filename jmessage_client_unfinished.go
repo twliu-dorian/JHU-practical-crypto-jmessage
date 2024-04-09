@@ -158,6 +158,17 @@ func main() {
 			} else {
 				fmt.Printf("%s's public key fingerprint is: %s\n", strings.TrimSpace(parts[1]), fingerprint)
 			}
+		case "ATTACK":
+			if len(parts) < 2 {
+				fmt.Println("Correct usage: attack <username>")
+			} else {
+				interceptedMessage, err := cmd.Attack(strings.TrimSpace(parts[1]))
+				if err != nil {
+					fmt.Println("An error occured while attacking", err)
+				} else {
+					fmt.Printf("%s is the intercepted message\n", interceptedMessage)
+				}
+			}
 		case "QUIT":
 			running = false
 		case "HELP":

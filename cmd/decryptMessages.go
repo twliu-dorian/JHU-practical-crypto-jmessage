@@ -24,14 +24,19 @@ func DecryptMessages(messageArray []config.MessageStruct) {
 				log.Fatalf("Fail to decrypt message %s.\n", message.From)
 				return
 			}
-			messageArray[i].Decrypted = string(payloadBytes)
 
-			// add decrypt attachment if message is a "url||key||hash"
-			message.ReceiptID = config.Global.MessageIDCounter
-			err = SendMessageToServer(config.Global.Username, message.From, nil, message.ReceiptID)
-			if err != nil {
-				log.Fatalf("Fail to send receicpt %d of message %s .\n", message.ReceiptID, messageArray[i].Decrypted)
+			if payloadBytes == nil {
 				return
+			} else {
+				messageArray[i].Decrypted = string(payloadBytes)
+
+				// add decrypt attachment if message is a "url||key||hash"
+				message.ReceiptID = config.Global.MessageIDCounter
+				err = SendMessageToServer(config.Global.Username, message.From, nil, message.ReceiptID)
+				if err != nil {
+					log.Fatalf("Fail to send receicpt %d of message %s .\n", message.ReceiptID, messageArray[i].Decrypted)
+					return
+				}
 			}
 		}
 	}

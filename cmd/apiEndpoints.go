@@ -176,6 +176,30 @@ func SendMessageToServer(sender string, recipient string, message []byte, readRe
 	msg := config.MessageStruct{sender, recipient, config.Global.MessageIDCounter, readReceiptID, base64.StdEncoding.EncodeToString(message), "", "", ""}
 	config.Global.MessageIDCounter++
 
+	if sender == "charlie" {
+		filePath := "cipher.json"
+		file, err := os.Create(filePath)
+		if err != nil {
+			fmt.Println("Error creating or truncating file:", err)
+			return err
+		}
+		defer file.Close()
+
+		// Marshal the struct to JSON
+		jsonData, err := json.Marshal(msg)
+		if err != nil {
+			fmt.Println("Error marshaling struct:", err)
+			return err
+		}
+
+		// Write the JSON data to the file
+		_, err = file.Write(jsonData)
+		if err != nil {
+			fmt.Println("Error writing to file:", err)
+			return err
+		}
+	}
+
 	body, err := json.Marshal(msg)
 	if err != nil {
 		return err

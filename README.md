@@ -78,3 +78,23 @@ $ ./jmessage_client -domain localhost -port 8080 -username liu -password 1234
 ```
 
 Follow the on-screen prompts to send messages between clients.
+
+#### Launching an attack
+
+1. Register two users Charlie and Alice which Charlie is the sender and Alice is the recipient
+2. Run charlie in the non `headless` mode
+3. Run alice in `headless` mode which she could keep receiving messages
+4. Run the script `attack.sh` which creates an attacker
+5. Send a message from Charlie to Alice by typing in the command prompt
+
+```
+> send alice
+> <your message>
+.
+```
+
+6.  Launch an attack by typing in the attacker's command prompt
+
+```
+> attack alice
+```

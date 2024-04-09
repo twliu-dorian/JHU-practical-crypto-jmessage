@@ -174,15 +174,14 @@ func decryptC2(c2 string, K [32]byte) (senderUsername []byte, message []byte, er
 	check := binary.LittleEndian.Uint32(checkBytes)
 	calculatedCheck := crc32.ChecksumIEEE(decrypted)
 
-	// fix back
-	fmt.Printf("encrypted crc32: %x\n", encrypted[len(encrypted)-4:])
+	// fmt.Printf("encrypted crc32: %x\n", encrypted[len(encrypted)-4:])
 	fmt.Printf("origin    crc32: %x\n", check)
 	fmt.Printf("decrypted crc32: %x\n", calculatedCheck)
 
-	// if check != calculatedCheck {
-	// 	log.Fatalf("CRC32 CHECK mismatch, message integrity could not be verified")
-	// 	return nil, nil, err
-	// }
+	if check != calculatedCheck {
+		log.Fatalf("CRC32 CHECK mismatch, message integrity could not be verified")
+		return nil, nil, err
+	}
 
 	// Step 4: Extract the Original Message and Sender Username
 	separatorIndex := -1

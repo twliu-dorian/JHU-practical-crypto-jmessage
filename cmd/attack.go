@@ -30,7 +30,7 @@ func Attack(victimName string) (plaintext string, err error) {
 
 	username := message.From
 	config.Global.Username = username
-	fmt.Printf("username: %s\n", username)
+	fmt.Printf("sender username: %s\n", username)
 
 	payloadBytes, err := base64.StdEncoding.DecodeString(message.Payload)
 	if err != nil {
@@ -47,12 +47,22 @@ func Attack(victimName string) (plaintext string, err error) {
 
 	c2Bytes, _ := base64.StdEncoding.DecodeString(ciphertext.C2)
 
+	lenC2Bytes := len(c2Bytes)
 	// len(c2) - len(username) - len(CRC32) - len(':') - len('\n')
 	lenCiphertext := len(c2Bytes) - len(username) - 4 - 1 - 1
 
-	fmt.Printf("length of message to decrypt: %d\n", lenCiphertext)
-	crcC2Bytes := make([]byte, len(c2Bytes))
-	var decryptedMessage = ""
+	// B: creating the another byte slice to modify the original ciphertext
+	bBytes := make([]byte, len(c2Bytes)-4)
+	for i := range bBytes {
+		bBytes[i] = 0x00
+	}
+	x := byte('a') ^ byte(':')
+	bBytes[len(username)] = x
+
+	modCiphertext := make([]byte, lenC2Bytes)
+
+	decryptedMessage := make([]byte, lenCiphertext)
+
 	for i := 0; i < lenCiphertext; i++ {
 		var newAPIkey string
 		var globalPubKey config.PubKeyStruct
@@ -91,118 +101,59 @@ func Attack(victimName string) (plaintext string, err error) {
 			os.Exit(1)
 		}
 
-		newC2Bytes, decryptedByte, err := decryptInterceptMessage(message.Payload, config.Global.Username, victimName, c2Bytes, crcC2Bytes)
-		if err != nil {
-			fmt.Println("An error occured while encrypting message.", err)
-		}
-		c2Bytes = newC2Bytes
-		decryptedMessage = decryptedMessage + decryptedByte
-		fmt.Printf("decrypted message: %s\n", decryptedMessage)
-	}
-	return decryptedMessage, err
-}
+		guessingPos := len(message.From) + 1 + i
+		for j := 0; j < 0x7F; j++ {
+			copy(modCiphertext, c2Bytes)
+			bBytes[guessingPos] = byte(j)
+			modCiphertext = fixCRC(modCiphertext, bBytes)
 
-func decryptInterceptMessage(payload string, senderUsername string, victimName string, c2Bytes []byte, crcC2Bytes []byte) (newC2Bytes []byte, decryptedByte string, err error) {
-	// TODO: IMPLEMENT
+			modC2 := base64.StdEncoding.EncodeToString(modCiphertext)
 
-	payloadBytes, err := base64.StdEncoding.DecodeString(payload)
-	if err != nil {
-		log.Fatalf("Error base64 decoding payload: %v", err)
-		return nil, "", err
-	}
+			toSign := ciphertext.C1 + modC2
+			privKey := config.Global.GlobalPrivKey
+			sigBytes := ECDSASign([]byte(toSign), privKey)
 
-	var ciphertext config.CiphertextStruct
+			// Encode the resulting signature using BASE64
+			attackerSig := base64.StdEncoding.EncodeToString(sigBytes)
 
-	err = json.Unmarshal([]byte(payloadBytes), &ciphertext)
-	if err != nil {
-		log.Fatalf("Failed to unmarshal JSON: %v", err)
-	}
+			modPayload := config.CiphertextStruct{
+				C1:  ciphertext.C1,
+				C2:  modC2,
+				Sig: attackerSig,
+			}
+			modPayloadBytes, err := json.Marshal(modPayload)
+			if err != nil {
+				log.Fatalf("Error signing the message: %v", err)
+			}
+			SendMessageToServer(config.Global.Username, victimName, []byte(modPayloadBytes), 0)
 
-	fmt.Printf("origin c2Bytes  : %+v\n", c2Bytes)
+			// sleep and get read receipt
+			time.Sleep(3 * time.Duration(100) * time.Millisecond)
+			messageList, _ := GetMessagesFromServer()
 
-	modifiedCrcC2Bytes := make([]byte, len(crcC2Bytes))
-	copy(modifiedCrcC2Bytes, c2Bytes)
-
-	a := byte('a')
-	colon := byte(':')
-	x := colon ^ a
-	oracleByte := c2Bytes[len(senderUsername)-1] ^ byte(x)
-	fmt.Printf("oracleByte      : %+v\n", oracleByte)
-
-	// modifiedC2Bytes := make([]byte, len(c2Bytes))
-	// copy(modifiedC2Bytes, c2Bytes)
-	modifiedC2Bytes := append(c2Bytes[:len(senderUsername)-1], oracleByte)
-	fmt.Printf("modifiedC2Bytes : %+v\n", modifiedC2Bytes)
-
-	modifiedC2Bytes = append(modifiedC2Bytes, c2Bytes[len(senderUsername):]...)
-
-	fmt.Printf("modifiedC2Bytes : %+v\n", modifiedC2Bytes)
-
-	// guessing delimiter
-	toGuess := modifiedC2Bytes[len(senderUsername)]
-
-	for i := 0; i <= 0x7F; i++ {
-		guessed := toGuess ^ byte(i)
-		modifiedC2Bytes[len(senderUsername)] = guessed
-
-		// CRC B
-		deltaBytes := make([]byte, len(c2Bytes))
-		deltaBytes[len(senderUsername)-1] = x
-		// deltaBytes[len(senderUsername)] = byte(i)
-		deltaBytes[len(senderUsername)] = byte(i)
-		fmt.Printf("mod deltaBytes: %x\n", deltaBytes)
-		// crcB := crc32.ChecksumIEEE(deltaBytes)
-
-		// akash method
-		finalModifiedC2Bytes := FixCRC(modifiedCrcC2Bytes, deltaBytes)
-		fmt.Printf("finalModifiedC2Bytes:  %x\n", finalModifiedC2Bytes)
-		//
-
-		modifiedC2String := base64.StdEncoding.EncodeToString(finalModifiedC2Bytes)
-
-		toSign := ciphertext.C1 + modifiedC2String
-		privKey := config.Global.GlobalPrivKey
-		sigBytes := ECDSASign([]byte(toSign), privKey)
-
-		// Encode the resulting signature using BASE64
-		sig := base64.StdEncoding.EncodeToString(sigBytes)
-
-		modifiedPayload := config.CiphertextStruct{
-			C1:  ciphertext.C1,
-			C2:  modifiedC2String,
-			Sig: sig,
-		}
-
-		modifiedPayloadBytes, err := json.Marshal(modifiedPayload)
-		if err != nil {
-			log.Fatalf("Error signing the message: %v", err)
-		}
-
-		// Print the result
-		SendMessageToServer(config.Global.Username, victimName, []byte(modifiedPayloadBytes), 0)
-
-		// sleep and get read receipt
-		time.Sleep(3 * time.Duration(100) * time.Millisecond)
-		readReceipt, _ := GetMessagesFromServer()
-
-		for f := 0; f < len(readReceipt); f++ {
-			message := readReceipt[f]
-			fmt.Printf("read receipt: %v\n", message.ReceiptID)
-			if readReceipt[0].ReceiptID > -1 {
-				fmt.Printf("guessed:       %x\n", guessed)
-				correctGuess := byte(i) ^ byte(':')
-				decryptedByte = string(correctGuess)
+			getReadReceipt := false
+			for _, message := range messageList {
+				fmt.Printf("read receipt: %v\n", message.ReceiptID)
+				if message.ReceiptID > -1 {
+					getReadReceipt = true
+					break
+				}
+			}
+			if getReadReceipt {
+				decryptedMessage[i] = byte(j) ^ byte(':')
+				decryptedByte = string(decryptedMessage[i])
+				bBytes[guessingPos] = decryptedMessage[i] ^ byte('a')
 				fmt.Printf("decryptedByte: %s\n", decryptedByte)
-				return modifiedC2Bytes, decryptedByte, err
+				fmt.Printf("bBytes:        %v\n", bBytes)
+				break
 			}
 		}
-	}
 
-	return nil, "", err
+	}
+	return string(decryptedMessage), err
 }
 
-// charlie || : || hi\n || crc
-func FixCRC(c2Ciphertext []byte, XoringB []byte) []byte {
+func fixCRC(c2Ciphertext []byte, XoringB []byte) []byte {
 
 	modifiedCiphertext := make([]byte, len(c2Ciphertext))
 

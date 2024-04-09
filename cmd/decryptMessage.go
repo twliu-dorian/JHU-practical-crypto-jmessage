@@ -175,6 +175,7 @@ func decryptC2(c2 string, K [32]byte) (senderUsername []byte, message []byte, er
 	calculatedCheck := crc32.ChecksumIEEE(decrypted)
 
 	// fix back
+	fmt.Printf("encrypted crc32: %x\n", encrypted[len(encrypted)-4:])
 	fmt.Printf("origin    crc32: %x\n", check)
 	fmt.Printf("decrypted crc32: %x\n", calculatedCheck)
 

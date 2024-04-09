@@ -49,9 +49,9 @@ func Attack(victimName string) (plaintext string, err error) {
 
 	// len(c2) - len(username) - len(CRC32) - len(':') - len('\n')
 	lenCiphertext := len(c2Bytes) - len(username) - 4 - 1 - 1
-	fmt.Printf("%d %d\n", len(c2Bytes), len(username))
-	fmt.Printf("length of message to decrypt: %d\n", lenCiphertext)
 
+	fmt.Printf("length of message to decrypt: %d\n", lenCiphertext)
+	crcC2Bytes := make([]byte, len(c2Bytes))
 	var decryptedMessage = ""
 	for i := 0; i < lenCiphertext; i++ {
 		var newAPIkey string
@@ -90,9 +90,8 @@ func Attack(victimName string) (plaintext string, err error) {
 			fmt.Println("Unable to register public key with server, exiting.")
 			os.Exit(1)
 		}
-		//
-		newC2Bytes, decryptedByte, err := decryptInterceptMessage(message.Payload, config.Global.Username, victimName, c2Bytes)
-		// SendMessageToServer
+
+		newC2Bytes, decryptedByte, err := decryptInterceptMessage(message.Payload, config.Global.Username, victimName, c2Bytes, crcC2Bytes)
 		if err != nil {
 			fmt.Println("An error occured while encrypting message.", err)
 		}
@@ -100,31 +99,10 @@ func Attack(victimName string) (plaintext string, err error) {
 		decryptedMessage = decryptedMessage + decryptedByte
 		fmt.Printf("decrypted message: %s\n", decryptedMessage)
 	}
-	// fmt.Println("decrypted message:", decryptedMessage)
-
 	return decryptedMessage, err
 }
 
-func readInterceptedMessage(filePath string) (message config.MessageStruct, err error) {
-	// Open the file
-	file, err := os.Open(filePath)
-	if err != nil {
-		fmt.Println("Error opening file:", err)
-		return
-	}
-	defer file.Close()
-
-	// Decode the JSON data from the file
-	err = json.NewDecoder(file).Decode(&message)
-	if err != nil {
-		fmt.Println("Error decoding JSON:", err)
-		return
-	}
-
-	return
-}
-
-func decryptInterceptMessage(payload string, senderUsername string, victimName string, c2Bytes []byte) (newC2Bytes []byte, decryptedByte string, err error) {
+func decryptInterceptMessage(payload string, senderUsername string, victimName string, c2Bytes []byte, crcC2Bytes []byte) (newC2Bytes []byte, decryptedByte string, err error) {
 	// TODO: IMPLEMENT
 
 	payloadBytes, err := base64.StdEncoding.DecodeString(payload)
@@ -142,16 +120,8 @@ func decryptInterceptMessage(payload string, senderUsername string, victimName s
 
 	fmt.Printf("origin c2Bytes  : %+v\n", c2Bytes)
 
-	modC2Bytes := make([]byte, len(c2Bytes))
-	copy(modC2Bytes, c2Bytes)
-
-	// CRC A
-	// Calculate crcAOriginal before the loop
-	crcAOriginalBytes := modC2Bytes[len(modC2Bytes)-4:]
-	crcAOriginal := binary.LittleEndian.Uint32(crcAOriginalBytes)
-	fmt.Printf("crcAOriginal: %x\n", crcAOriginal)
-
-	// CRC A
+	modifiedCrcC2Bytes := make([]byte, len(crcC2Bytes))
+	copy(modifiedCrcC2Bytes, c2Bytes)
 
 	a := byte('a')
 	colon := byte(':')
@@ -159,6 +129,8 @@ func decryptInterceptMessage(payload string, senderUsername string, victimName s
 	oracleByte := c2Bytes[len(senderUsername)-1] ^ byte(x)
 	fmt.Printf("oracleByte      : %+v\n", oracleByte)
 
+	// modifiedC2Bytes := make([]byte, len(c2Bytes))
+	// copy(modifiedC2Bytes, c2Bytes)
 	modifiedC2Bytes := append(c2Bytes[:len(senderUsername)-1], oracleByte)
 	fmt.Printf("modifiedC2Bytes : %+v\n", modifiedC2Bytes)
 
@@ -168,15 +140,10 @@ func decryptInterceptMessage(payload string, senderUsername string, victimName s
 
 	// guessing delimiter
 	toGuess := modifiedC2Bytes[len(senderUsername)]
-	// modified_a := make([]byte, len(originalC2Bytes))
-	// copy(modified_a, originalC2Bytes)
 
 	for i := 0; i <= 0x7F; i++ {
 		guessed := toGuess ^ byte(i)
 		modifiedC2Bytes[len(senderUsername)] = guessed
-
-		// CRC A
-		// crcA := crcAOriginal
 
 		// CRC B
 		deltaBytes := make([]byte, len(c2Bytes))
@@ -187,39 +154,9 @@ func decryptInterceptMessage(payload string, senderUsername string, victimName s
 		// crcB := crc32.ChecksumIEEE(deltaBytes)
 
 		// akash method
-		finalModifiedC2Bytes := FixCRC(modC2Bytes, deltaBytes)
+		finalModifiedC2Bytes := FixCRC(modifiedCrcC2Bytes, deltaBytes)
 		fmt.Printf("finalModifiedC2Bytes:  %x\n", finalModifiedC2Bytes)
 		//
-		// CRC 0
-		// zeroLength := max(len(c2Bytes)-4, len(deltaBytes))
-		// zeroBytes := make([]byte, zeroLength)
-		// crc32OfZero := crc32.ChecksumIEEE(zeroBytes)
-
-		// CRC(A) xor CRC(B) xor CRC(0)
-		// adjustedCRC32 := crc32OfZero ^ crcA ^ crcB
-		// fmt.Printf("crc B:             %x\n", crcB)
-		// fmt.Printf("crc adjustedCRC32: %x\n", adjustedCRC32)
-		// fmt.Printf("B : %x\n", deltaBytes)
-		// // dataOnlyModified := modifiedC2Bytes[:len(modifiedC2Bytes)-4]
-		// newCRC32Bytes := make([]byte, 4)
-		// binary.LittleEndian.PutUint32(newCRC32Bytes, adjustedCRC32)
-		// modifiedC2Bytes := append(modifiedC2Bytes, newCRC32Bytes...)
-
-		// for j := 0; j < len(originalC2Bytes)-4; j++ {
-		// 	modified_a[j] ^= deltaBytes[j]
-		// 	fmt.Printf("%d %x\n", j, modified_a[j])
-		// }
-		// fmt.Printf("nmodified a: %v\n", modified_a)
-
-		// modified_crc := make([]byte, len(modified_a))
-
-		// Copy the original byte array to the new byte array, excluding the last four bytes
-		// copy(modified_crc, modified_a[:len(modified_a)-4])
-
-		// Append the new four bytes to the new byte array
-		// modified_crc = append(modified_crc, newCRC32Bytes...)
-
-		// fmt.Printf("crc modifiedC2Bytes: %v\n", modifiedC2Bytes)
 
 		modifiedC2String := base64.StdEncoding.EncodeToString(finalModifiedC2Bytes)
 
@@ -235,10 +172,12 @@ func decryptInterceptMessage(payload string, senderUsername string, victimName s
 			C2:  modifiedC2String,
 			Sig: sig,
 		}
+
 		modifiedPayloadBytes, err := json.Marshal(modifiedPayload)
 		if err != nil {
 			log.Fatalf("Error signing the message: %v", err)
 		}
+
 		// Print the result
 		SendMessageToServer(config.Global.Username, victimName, []byte(modifiedPayloadBytes), 0)
 
@@ -299,4 +238,23 @@ func FixCRC(c2Ciphertext []byte, XoringB []byte) []byte {
 	binary.LittleEndian.PutUint32(modifiedCiphertext[len(modifiedCiphertext)-4:], crc32New)
 
 	return modifiedCiphertext
+}
+
+func readInterceptedMessage(filePath string) (message config.MessageStruct, err error) {
+	// Open the file
+	file, err := os.Open(filePath)
+	if err != nil {
+		fmt.Println("Error opening file:", err)
+		return
+	}
+	defer file.Close()
+
+	// Decode the JSON data from the file
+	err = json.NewDecoder(file).Decode(&message)
+	if err != nil {
+		fmt.Println("Error decoding JSON:", err)
+		return
+	}
+
+	return
 }
